@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CDNEWS — Tin nóng từng phút</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#16241D;
+    --ink-soft:#31423A;
+    --paper:#F2F4EF;
+    --paper-card:#E7EAE1;
+    --paper-line:#CBD1C4;
+    --signal:#C4432B;
+    --signal-dark:#9C3520;
+    --gold:#D8A93F;
+    --wire:#5C6E63;
+    --white:#FBFBF8;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit; text-decoration:none;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  .wrap{max-width:1240px; margin:0 auto; padding:0 32px;}
+
+  /* ===== focus visibility ===== */
+  a:focus-visible, button:focus-visible, input:focus-visible{
+    outline:2px solid var(--signal); outline-offset:3px;
+  }
+
+  /* ===== MASTHEAD ===== */
+  header.masthead{
+    background:var(--ink);
+    color:var(--paper);
+    padding:14px 0;
+    position:sticky; top:0; z-index:100;
+    border-bottom:3px solid var(--signal);
+  }
+  .masthead-row{
+    display:flex; align-items:center; justify-content:space-between; gap:24px;
+  }
+  .brand{
+    display:flex; align-items:baseline; gap:10px;
+  }
+  .brand-mark{
+    font-family:'Fraunces',serif; font-weight:900; font-size:1.9rem;
+    letter-spacing:-0.02em;
+  }
+  .brand-mark span{ color:var(--signal); }
+  .brand-tag{
+    font-family:'IBM Plex Mono',monospace; font-size:0.62rem;
+    letter-spacing:0.14em; text-transform:uppercase; color:var(--gold);
+    border-left:1px solid rgba(251,251,248,0.3); padding-left:10px;
+  }
+  nav.primary{
+    display:flex; gap:26px; font-size:0.86rem; font-weight:500;
+  }
+  nav.primary a{
+    position:relative; padding:4px 0; color:rgba(251,251,248,0.82);
+    transition:color .15s ease;
+  }
+  nav.primary a:hover{ color:var(--white); }
+  nav.primary a::after{
+    content:""; position:absolute; left:0; bottom:-4px; height:2px; width:0;
+    background:var(--signal); transition:width .18s ease;
+  }
+  nav.primary a:hover::after{ width:100%; }
+  .clock{
+    font-family:'IBM Plex Mono',monospace; font-size:0.74rem; color:var(--gold);
+    text-align:right; white-space:nowrap;
+  }
+  .nav-toggle{ display:none; background:none; border:1px solid rgba(251,251,248,0.4); color:var(--paper); font-size:1.1rem; padding:6px 10px; border-radius:3px;}
+
+  /* ===== TICKER ===== */
+  .ticker-bar{
+    background:var(--signal); color:var(--white);
+    display:flex; align-items:center; overflow:hidden;
+    border-bottom:1px solid var(--signal-dark);
+  }
+  .ticker-label{
+    flex:0 0 auto; background:var(--signal-dark); font-family:'IBM Plex Mono',monospace;
+    font-size:0.68rem; letter-spacing:0.12em; font-weight:600; padding:8px 16px;
+    display:flex; align-items:center; gap:8px; text-transform:uppercase;
+  }
+  .ticker-label .dot{ width:6px; height:6px; border-radius:50%; background:var(--gold); animation:pulse 1.4s infinite; }
+  @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:.25;} }
+  .ticker-track-wrap{ flex:1; overflow:hidden; position:relative; height:34px; }
+  .ticker-track{
+    position:absolute; white-space:nowrap; display:flex; align-items:center; height:100%;
+    animation:scroll-left 38s linear infinite;
+    font-size:0.82rem; font-weight:500;
+  }
+  .ticker-track:hover{ animation-play-state:paused; }
+  .ticker-track span.item{ padding:0 26px; position:relative; }
+  .ticker-track span.item::before{
+    content:"//"; margin-right:14px; opacity:.55; font-family:'IBM Plex Mono',monospace; font-size:0.72rem;
+  }
+  @keyframes scroll-left{
+    from{ transform:translateX(0); }
+    to{ transform:translateX(-50%); }
+  }
+
+  /* ===== HERO ===== */
+  .hero{ padding:56px 0 48px; }
+  .hero-grid{
+    display:grid; grid-template-columns:1.5fr 1fr; gap:40px;
+  }
+  .lead-card{
+    background:var(--ink); color:var(--white); border-radius:6px; overflow:hidden;
+    display:flex; flex-direction:column; position:relative;
+  }
+  .lead-visual{
+    height:280px; position:relative; overflow:hidden;
+    background:
+      radial-gradient(circle at 25% 20%, rgba(216,169,63,0.35), transparent 45%),
+      radial-gradient(circle at 80% 70%, rgba(196,67,43,0.5), transparent 50%),
+      repeating-linear-gradient(115deg, rgba(251,251,248,0.05) 0 2px, transparent 2px 22px),
+      linear-gradient(160deg, #223429, #16241D 70%);
+  }
+  .stamp{
+    position:absolute; top:20px; left:20px;
+    border:2px solid var(--gold); color:var(--gold);
+    font-family:'IBM Plex Mono',monospace; font-size:0.68rem; font-weight:600;
+    letter-spacing:0.12em; padding:5px 10px; transform:rotate(-4deg);
+    text-transform:uppercase;
+  }
+  .dateline{
+    position:absolute; bottom:16px; left:20px; font-family:'IBM Plex Mono',monospace;
+    font-size:0.68rem; color:rgba(251,251,248,0.65); letter-spacing:0.06em;
+  }
+  .lead-body{ padding:28px 30px 32px; }
+  .lead-body .cat{
+    font-family:'IBM Plex Mono',monospace; font-size:0.68rem; color:var(--signal);
+    background:rgba(196,67,43,0.15); display:inline-block; padding:4px 9px; border-radius:3px;
+    letter-spacing:0.1em; margin-bottom:14px; text-transform:uppercase;
+  }
+  .lead-body h1{
+    font-family:'Fraunces',serif; font-weight:600; font-size:2rem; line-height:1.18;
+    margin-bottom:14px;
+  }
+  .lead-body p{ color:rgba(251,251,248,0.75); font-size:0.98rem; max-width:52ch; }
+  .lead-meta{
+    margin-top:20px; display:flex; gap:18px; font-family:'IBM Plex Mono',monospace;
+    font-size:0.7rem; color:var(--gold);
+  }
+
+  .dispatch-col{ display:flex; flex-direction:column; gap:14px; }
+  .dispatch-card{
+    background:var(--paper-card); border:1px solid var(--paper-line); border-radius:6px;
+    padding:16px 18px; display:flex; gap:14px; align-items:flex-start;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .dispatch-card:hover{ transform:translateX(3px); box-shadow:-3px 0 0 var(--signal); }
+  .dispatch-id{
+    font-family:'IBM Plex Mono',monospace; font-size:0.68rem; color:var(--wire);
+    flex:0 0 auto; padding-top:2px;
+  }
+  .dispatch-text .cat-sm{
+    font-family:'IBM Plex Mono',monospace; font-size:0.62rem; color:var(--signal);
+    text-transform:uppercase; letter-spacing:0.09em; display:block; margin-bottom:4px;
+  }
+  .dispatch-text h3{ font-family:'Fraunces',serif; font-weight:600; font-size:1.02rem; line-height:1.3; }
+  .dispatch-text time{ font-family:'IBM Plex Mono',monospace; font-size:0.66rem; color:var(--wire); display:block; margin-top:6px; }
+
+  /* ===== STATS ===== */
+  .stats{
+    background:var(--ink); color:var(--paper); padding:34px 0;
+    border-top:1px solid rgba(251,251,248,0.08); border-bottom:1px solid rgba(251,251,248,0.08);
+  }
+  .stats-grid{
+    display:grid; grid-template-columns:repeat(5,1fr); text-align:center;
+  }
+  .stat-item{ padding:0 10px; border-left:1px solid rgba(251,251,248,0.12); }
+  .stat-item:first-child{ border-left:none; }
+  .stat-num{
+    font-family:'Fraunces',serif; font-weight:700; font-size:2.1rem; color:var(--gold);
+  }
+  .stat-num::after{ content:attr(data-suffix); font-size:1.2rem; }
+  .stat-label{
+    font-family:'IBM Plex Mono',monospace; font-size:0.66rem; letter-spacing:0.08em;
+    text-transform:uppercase; color:rgba(251,251,248,0.65); margin-top:6px;
+  }
+
+  /* ===== DESK / TABS ===== */
+  .desk{ padding:60px 0; }
+  .section-head{
+    display:flex; align-items:baseline; justify-content:space-between; margin-bottom:26px;
+    border-bottom:2px solid var(--ink); padding-bottom:14px; flex-wrap:wrap; gap:12px;
+  }
+  .section-head h2{ font-family:'Fraunces',serif; font-weight:700; font-size:1.7rem; }
+  .section-head .eyebrow{
+    font-family:'IBM Plex Mono',monospace; font-size:0.68rem; color:var(--signal);
+    letter-spacing:0.12em; text-transform:uppercase; display:block; margin-bottom:4px;
+  }
+  .tabs{ display:flex; gap:8px; flex-wrap:wrap; }
+  .tab-btn{
+    font-family:'IBM Plex Mono',monospace; font-size:0.72rem; letter-spacing:0.05em;
+    background:none; border:1px solid var(--paper-line); color:var(--ink-soft);
+    padding:8px 14px; border-radius:20px; cursor:pointer; transition:all .15s ease;
+    text-transform:uppercase;
+  }
+  .tab-btn:hover{ border-color:var(--signal); color:var(--signal); }
+  .tab-btn.active{ background:var(--ink); border-color:var(--ink); color:var(--white); }
+
+  .article-grid{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:22px;
+  }
+  .article-grid.hidden{ display:none; }
+  .a-card{
+    background:var(--white); border:1px solid var(--paper-line); border-radius:6px;
+    overflow:hidden; display:flex; flex-direction:column;
+    transition:box-shadow .18s ease, transform .18s ease;
+  }
+  .a-card:hover{ box-shadow:0 10px 24px rgba(22,36,29,0.1); transform:translateY(-2px); }
+  .a-thumb{
+    height:140px; position:relative;
+    background:linear-gradient(135deg, var(--thumb-a,#2c4235), var(--thumb-b,#16241D));
+  }
+  .a-thumb::before{
+    content:""; position:absolute; inset:0;
+    background-image:repeating-linear-gradient(45deg, rgba(251,251,248,0.06) 0 1px, transparent 1px 14px);
+  }
+  .a-thumb .cat-chip{
+    position:absolute; bottom:10px; left:12px; font-family:'IBM Plex Mono',monospace;
+    font-size:0.62rem; letter-spacing:0.08em; background:var(--white); color:var(--ink);
+    padding:4px 9px; border-radius:3px; text-transform:uppercase; font-weight:600;
+  }
+  .a-body{ padding:16px 18px 18px; display:flex; flex-direction:column; gap:8px; flex:1; }
+  .a-body h3{ font-family:'Fraunces',serif; font-size:1.08rem; font-weight:600; line-height:1.32; }
+  .a-body p{ font-size:0.86rem; color:var(--ink-soft); flex:1; }
+  .a-foot{
+    display:flex; justify-content:space-between; font-family:'IBM Plex Mono',monospace;
+    font-size:0.66rem; color:var(--wire); margin-top:6px; padding-top:10px; border-top:1px dashed var(--paper-line);
+  }
+
+  /* ===== NEWSLETTER ===== */
+  .subscribe{
+    background:var(--signal); color:var(--white); padding:52px 0; position:relative; overflow:hidden;
+  }
+  .subscribe::before{
+    content:""; position:absolute; inset:0;
+    background-image:repeating-linear-gradient(90deg, rgba(255,255,255,0.05) 0 1px, transparent 1px 40px);
+  }
+  .subscribe-inner{
+    position:relative; display:flex; align-items:center; justify-content:space-between; gap:30px; flex-wrap:wrap;
+  }
+  .subscribe h2{ font-family:'Fraunces',serif; font-weight:700; font-size:1.7rem; max-width:420px; }
+  .subscribe p{ font-size:0.9rem; opacity:.9; margin-top:8px; max-width:420px; }
+  .sub-form{ display:flex; gap:0; flex:0 0 auto; }
+  .sub-form input{
+    font-family:'Inter',sans-serif; font-size:0.9rem; padding:14px 16px; border:none;
+    width:260px; border-radius:4px 0 0 4px; outline:none;
+  }
+  .sub-form button{
+    font-family:'IBM Plex Mono',monospace; font-size:0.76rem; letter-spacing:0.06em;
+    text-transform:uppercase; background:var(--ink); color:var(--white); border:none;
+    padding:0 22px; border-radius:0 4px 4px 0; cursor:pointer; transition:background .15s ease;
+  }
+  .sub-form button:hover{ background:#0d1712; }
+
+  /* ===== PARTNERS ===== */
+  .partners{ padding:50px 0; text-align:center; }
+  .partners .eyebrow{
+    font-family:'IBM Plex Mono',monospace; font-size:0.7rem; color:var(--wire);
+    letter-spacing:0.14em; text-transform:uppercase; margin-bottom:22px; display:block;
+  }
+  .partner-row{
+    display:flex; justify-content:center; gap:14px; flex-wrap:wrap;
+  }
+  .partner-badge{
+    font-family:'Fraunces',serif; font-weight:600; font-size:0.95rem; color:var(--ink-soft);
+    border:1px solid var(--paper-line); padding:10px 20px; border-radius:4px; background:var(--paper-card);
+  }
+
+  /* ===== FOOTER ===== */
+  footer{ background:var(--ink); color:rgba(251,251,248,0.75); padding:48px 0 24px; }
+  .footer-grid{ display:grid; grid-template-columns:1.3fr 1fr 1fr; gap:40px; padding-bottom:30px; border-bottom:1px solid rgba(251,251,248,0.12); }
+  .footer-brand .brand-mark{ color:var(--white); }
+  .footer-brand p{ font-size:0.85rem; margin-top:12px; max-width:36ch; color:rgba(251,251,248,0.55); }
+  footer h4{ font-family:'IBM Plex Mono',monospace; font-size:0.68rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--gold); margin-bottom:14px; }
+  footer ul{ list-style:none; display:flex; flex-direction:column; gap:9px; font-size:0.86rem; }
+  footer ul a:hover{ color:var(--white); }
+  .footer-bottom{ display:flex; justify-content:space-between; padding-top:20px; font-family:'IBM Plex Mono',monospace; font-size:0.68rem; color:rgba(251,251,248,0.45); flex-wrap:wrap; gap:8px;}
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 880px){
+    nav.primary{ display:none; }
+    .nav-toggle{ display:inline-block; }
+    .hero-grid{ grid-template-columns:1fr; }
+    .stats-grid{ grid-template-columns:repeat(2,1fr); row-gap:20px; }
+    .stat-item:nth-child(3){ border-left:none; }
+    .article-grid{ grid-template-columns:1fr; }
+    .footer-grid{ grid-template-columns:1fr; gap:26px; }
+    .subscribe-inner{ flex-direction:column; align-items:flex-start; }
+    .sub-form{ width:100%; }
+    .sub-form input{ flex:1; width:auto; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .ticker-track{ animation:none; }
+    .dot{ animation:none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap masthead-row">
+    <div class="brand">
+      <span class="brand-mark">CD<span>NEWS</span></span>
+      <span class="brand-tag">Tin nóng — Tin thật — Tin nhanh</span>
+    </div>
+    <nav class="primary">
+      <a href="#trangchu">Trang chủ</a>
+      <a href="#thoisu">Thời sự</a>
+      <a href="#kinhdoanh">Kinh doanh</a>
+      <a href="#congnghe">Công nghệ</a>
+      <a href="#thethao">Thể thao</a>
+      <a href="#giaitri">Giải trí</a>
+    </nav>
+    <div class="clock mono" id="clockBox">--:--:-- · --/--/----</div>
+    <button class="nav-toggle" aria-label="Mở menu">☰</button>
+  </div>
+</header>
+
+<div class="ticker-bar">
+  <div class="ticker-label"><span class="dot"></span> TIN MỚI</div>
+  <div class="ticker-track-wrap">
+    <div class="ticker-track mono" id="tickerTrack"></div>
+  </div>
+</div>
+
+<main>
+  <section class="hero wrap" id="trangchu">
+    <div class="hero-grid">
+      <article class="lead-card">
+        <div class="lead-visual">
+          <div class="stamp">Tin nóng</div>
+          <div class="dateline">DISPATCH · HN-2847 · CDNEWS BUREAU</div>
+        </div>
+        <div class="lead-body">
+          <span class="cat">Thời sự</span>
+          <h1>Hà Nội thí điểm làn đường ưu tiên xe buýt điện tại 5 quận trung tâm</h1>
+          <p>Đề án bắt đầu chạy thử từ đầu tháng sau, kỳ vọng giảm thời gian di chuyển giờ cao điểm và mở đường cho mạng lưới xe buýt điện toàn thành phố vào năm 2028.</p>
+          <div class="lead-meta">
+            <span>PV. Minh Anh</span>
+            <span>08:12 · Hôm nay</span>
+            <span>4 phút đọc</span>
+          </div>
+        </div>
+      </article>
+
+      <div class="dispatch-col">
+        <div class="dispatch-card">
+          <span class="dispatch-id mono">#118</span>
+          <div class="dispatch-text">
+            <span class="cat-sm">Kinh doanh</span>
+            <h3>Giá cà phê Robusta lập đỉnh mới trong quý III</h3>
+            <time>14 phút trước</time>
+          </div>
+        </div>
+        <div class="dispatch-card">
+          <span class="dispatch-id mono">#117</span>
+          <div class="dispatch-text">
+            <span class="cat-sm">Công nghệ</span>
+            <h3>Một startup Việt ra mắt chip AI tiết kiệm năng lượng</h3>
+            <time>32 phút trước</time>
+          </div>
+        </div>
+        <div class="dispatch-card">
+          <span class="dispatch-id mono">#116</span>
+          <div class="dispatch-text">
+            <span class="cat-sm">Thể thao</span>
+            <h3>Đội tuyển futsal nữ giành vé vào bán kết châu Á</h3>
+            <time>51 phút trước</time>
+          </div>
+        </div>
+        <div class="dispatch-card">
+          <span class="dispatch-id mono">#115</span>
+          <div class="dispatch-text">
+            <span class="cat-sm">Giải trí</span>
+            <h3>Liên hoan phim ngắn sinh viên khởi động vòng chấm sơ khảo</h3>
+            <time>1 giờ trước</time>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="stats">
+    <div class="wrap stats-grid">
+      <div class="stat-item"><div class="stat-num mono" data-count="482" data-suffix="K">0</div><div class="stat-label">Bạn đọc hôm nay</div></div>
+      <div class="stat-item"><div class="stat-num mono" data-count="126" data-suffix="">0</div><div class="stat-label">Tin đăng trong ngày</div></div>
+      <div class="stat-item"><div class="stat-num mono" data-count="38" data-suffix="">0</div><div class="stat-label">Phóng viên hiện trường</div></div>
+      <div class="stat-item"><div class="stat-num mono" data-count="63" data-suffix="">0</div><div class="stat-label">Tỉnh thành cập nhật</div></div>
+      <div class="stat-item"><div class="stat-num mono" data-count="9" data-suffix="">0</div><div class="stat-label">Năm hoạt động</div></div>
+    </div>
+  </section>
+
+  <section class="desk wrap" id="banthoisu">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow">Bàn biên tập</span>
+        <h2>Tin theo chuyên mục</h2>
+      </div>
+      <div class="tabs" id="tabBar">
+        <button class="tab-btn active" data-tab="thoisu">Thời sự</button>
+        <button class="tab-btn" data-tab="kinhdoanh">Kinh doanh</button>
+        <button class="tab-btn" data-tab="congnghe">Công nghệ</button>
+        <button class="tab-btn" data-tab="thethao">Thể thao</button>
+        <button class="tab-btn" data-tab="giaitri">Giải trí</button>
+      </div>
+    </div>
+
+    <div class="article-grid" data-panel="thoisu">
+      <div class="a-card">
+        <div class="a-thumb" style="--thumb-a:#33473b;--thumb-b:#16241D;"><span class="cat-chip">Thời sự</span></div>
+        <div class="a-body">
+          <h3>Cầu vượt sông Hồng thứ ba dự kiến thông xe kỹ thuật cuối năm</h3>
+          <p>Ban quản lý dự án cho biết tiến độ thi công đã đạt hơn 80%, vượt kế hoạch đề ra đầu năm.</p>
+          <div class="a-foot"><span>Thời sự</span><span>2 giờ trước</span></div>
+        </div>
+      </div>
+      <div class="a-card">
+        <div class="a-thumb" style="--thumb-a:#3a3126;--thumb-b:#16241D;"><span class="cat-chip">Thời sự</span></div>
+        <div class="a-body">
+          <h3>Miền Trung chủ động ứng phó đợt mưa lớn đầu mùa</h3>
+          <p>Các địa phương ven biển đã lên phương án sơ tán dân cư tại vùng trũng thấp trước 48 giờ.</p>
+          <div class="a-foot"><span>Thời sự</span><span>3 giờ trước</span></div>
+        </div>
+      </div>
+      <div class="a-card">
+        <div class="a-thumb" style="--thumb-a:#2c3d4a;--thumb-b:#16241D;"><span class="cat-chip">Thời sự</span></div>
+        <div class="a-body">
+          <h3>Đề xuất mở rộng tuyến metro số 3 thêm 4 nhà ga</h3>
+          <p>Phương án điều chỉnh đang lấy ý kiến người dân dọc tuyến trước khi trình phê duyệt.</p>
+          <div class="a-foot"><span>Thời sự</span><span>5 giờ trước</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="article-grid hidden" data-panel="kinhdoanh">
+      <div class="a-card">
+        <div class="a-thumb" style="--thumb-a:#4a3a24;--thumb-b:#16241D;"><span class="cat-chip">Kinh doanh</span></div>
+        <div class="a-body">
+          <h3>Doanh nghiệp dệt may đón đơn hàng dài hạn từ EU</h3>
+          <p>Nhiều nhà máy tại phía Bắc đã kín lịch sản xuất đến hết quý I năm sau.</p>
+          <div class="a-foot"><span>Kinh doanh</span><span>40 phút trước</span></div>
+        </div>
+      </div>
+      <div class="a-card">
+        <div class="a-thumb" style="--thumb-a:#39493d;--thumb-b:#16241D;"><span class="cat-chip">Kinh doanh</span></div>
+        <div class="a-body">
+          <h3>Ngân hàng Nhà nước giữ nguyên lãi suất điều hành</h3>
+          <p>Quyết định nhằm ổn định tỷ giá trong bối cảnh áp lực lạm phát toàn cầu hạ nhiệt.</p>
+          <div class="a-foot"><span>Kinh doanh</span><span>1 giờ trước</span></div>
+        </div>
+      </div>
+      <div class="a-card">
+        <div class="a-thumb" style="--thumb-a:#463047;--thumb-b:#16241D;"><span class="cat-chip">Kinh doanh</span></div>
+        <div class="a-body">
+          <h3>Start-up nông nghiệp công nghệ cao gọi vốn vòng Series A</h3>
+          <p>Khoản đầu tư sẽ dùng để mở rộng nhà kính thông minh sang ba tỉnh miền Tây.</p>
+          <div class="a-foot"><span>Kinh doanh</span><span>2 giờ trước</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="article-grid hidden" data-panel="congnghe">
+      <div class="a-card">
+        <div class="a-thumb" style="--thumb-a:#1f3a4a;--thumb-b:#16241D;"><span class="cat-chip">Công nghệ</span></div>
+        <div class="a-body">
+          <h3>Ứng dụng thuần Việt lọt top xu hướng khu vực Đông Nam Á</h3>
+          <p>Sản phẩm tập trung vào trợ lý học tập cá nhân hoá cho học sinh trung học.</p>
+          <div class="a-foot"><span>Công nghệ</span><span>25 phút trước</span></div>
+        </div>
+      </div>
+      <div class="a-card">
+        <div class="a-thumb" style="--thumb-a:#2d2d47;--thumb-b:#16241D;"><span class="cat-chip">Công nghệ</span></div>
+        <div class="a-body">
+          <h3>Trung tâm dữ liệu xanh đầu tiên vận hành thử tại Bình Dương</h3>
+          <p>Dự án sử dụng năng lượng mặt trời áp mái, giảm 30% chi phí làm mát so với thông thường.</p>
+          <div class="a-foot"><span>Công nghệ</span><span>1 giờ trước</span></div>
+        </div>
+      </div>
+      <div class="a-card">
+        <div class="a-thumb" style="--thumb-a:#463030;--thumb-b:#16241D;"><span class="cat-chip">Công nghệ</span></div>
+        <div class="a-body">
+          <h3>Sinh viên chế tạo robot dò khuyết tật đường ống nước sạch</h3>
+          <p>Thiết bị đã được thử nghiệm thành công tại hệ thống cấp nước của hai quận nội thành.</p>
+          <div class="a-foot"><span>Công nghệ</span><span>3 giờ trước</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="article-grid hidden" data-panel="thethao">
+      <div class="a-card">
+        <div class="a-thumb" style="--thumb-a:#1f4a34;--thumb-b:#16241D;"><span class="cat-chip">Thể thao</span></div>
+        <div class="a-body">
+          <h3>Đội tuyển bóng chuyền nữ tập trung chuẩn bị giải vô địch châu Á</h3>
+          <p>Ban huấn luyện triệu tập thêm hai gương mặt trẻ từ giải vô địch quốc gia.</p>
+          <div class="a-foot"><span>Thể thao</span><span>45 phút trước</span></div>
+        </div>
+      </div>
+      <div class="a-card">
+        <div class="a-thumb" style="--thumb-a:#4a1f2e;--thumb-b:#16241D;"><span class="cat-chip">Thể thao</span></div>
+        <div class="a-body">
+          <h3>Giải chạy marathon ven biển thu hút hơn 10.000 vận động viên</h3>
+          <p>Cung đường mới đi qua ba địa danh du lịch nổi bật của thành phố.</p>
+          <div class="a-foot"><span>Thể thao</span><span>2 giờ trước</span></div>
+        </div>
+      </div>
+      <div class="a-card">
+        <div class="a-thumb" style="--thumb-a:#333333;--thumb-b:#16241D;"><span class="cat-chip">Thể thao</span></div>
+        <div class="a-body">
+          <h3>CLB bóng rổ học sinh vô địch giải trẻ toàn quốc</h3>
+          <p>Đây là danh hiệu thứ hai liên tiếp của đội sau mùa giải năm ngoái.</p>
+          <div class="a-foot"><span>Thể thao</span><span>4 giờ trước</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="article-grid hidden" data-panel="giaitri">
+      <div class="a-card">
+        <div class="a-thumb" style="--thumb-a:#4a2f1f;--thumb-b:#16241D;"><span class="cat-chip">Giải trí</span></div>
+        <div class="a-body">
+          <h3>Triển lãm nghệ thuật đương đại mở cửa miễn phí cuối tuần này</h3>
+          <p>Không gian trưng bày quy tụ tác phẩm của 12 nghệ sĩ trẻ trong nước.</p>
+          <div class="a-foot"><span>Giải trí</span><span>1 giờ trước</span></div>
+        </div>
+      </div>
+      <div class="a-card">
+        <div class="a-thumb" style="--thumb-a:#392a4a;--thumb-b:#16241D;"><span class="cat-chip">Giải trí</span></div>
+        <div class="a-body">
+          <h3>Ban nhạc indie Việt phát hành album phòng thu đầu tay</h3>
+          <p>Album gồm 9 ca khúc lấy cảm hứng từ ký ức tuổi thơ ở vùng nông thôn Bắc Bộ.</p>
+          <div class="a-foot"><span>Giải trí</span><span>3 giờ trước</span></div>
+        </div>
+      </div>
+      <div class="a-card">
+        <div class="a-thumb" style="--thumb-a:#1f4040;--thumb-b:#16241D;"><span class="cat-chip">Giải trí</span></div>
+        <div class="a-body">
+          <h3>Liên hoan ẩm thực đường phố ba miền quy tụ hơn 80 gian hàng</h3>
+          <p>Sự kiện kéo dài ba ngày, dự kiến đón hàng chục nghìn lượt khách tham quan.</p>
+          <div class="a-foot"><span>Giải trí</span><span>5 giờ trước</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="subscribe">
+    <div class="wrap subscribe-inner">
+      <div>
+        <h2>Nhận bản tin đầu ngày từ CDNEWS</h2>
+        <p>Tóm tắt 5 tin quan trọng nhất mỗi sáng, gửi thẳng vào hộp thư của bạn — không quảng cáo, không spam.</p>
+      </div>
+      <form class="sub-form" onsubmit="event.preventDefault(); this.querySelector('button').textContent='Đã đăng ký ✓';">
+        <input type="email" placeholder="Email của bạn" required>
+        <button type="submit">Đăng ký</button>
+      </form>
+    </div>
+  </section>
+
+  <section class="partners wrap">
+    <span class="eyebrow">Đối tác nội dung &amp; hợp tác truyền thông</span>
+    <div class="partner-row">
+      <span class="partner-badge">Báo Nhân Dân</span>
+      <span class="partner-badge">VNExpress Media Lab</span>
+      <span class="partner-badge">Đài PT-TH Địa phương</span>
+      <span class="partner-badge">Trung tâm Báo chí Quốc gia</span>
+      <span class="partner-badge">Hội Nhà báo Việt Nam</span>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap footer-grid">
+    <div class="footer-brand">
+      <span class="brand-mark">CD<span style="color:var(--signal)">NEWS</span></span>
+      <p>Toà soạn điện tử cập nhật tin tức thời sự, kinh doanh, công nghệ và đời sống 24/7 trên mọi nền tảng.</p>
+    </div>
+    <div>
+      <h4>Chuyên mục</h4>
+      <ul>
+        <li><a href="#thoisu">Thời sự</a></li>
+        <li><a href="#kinhdoanh">Kinh doanh</a></li>
+        <li><a href="#congnghe">Công nghệ</a></li>
+        <li><a href="#thethao">Thể thao</a></li>
+        <li><a href="#giaitri">Giải trí</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Liên hệ toà soạn</h4>
+      <ul>
+        <li>Hotline: 0900 123 456</li>
+        <li>Email: toasoan@cdnews.vn</li>
+        <li>Fanpage: fb.com/cdnews.official</li>
+      </ul>
+    </div>
+  </div>
+  <div class="wrap footer-bottom">
+    <span>© 2026 CDNEWS. Trang minh hoạ thiết kế — nội dung mẫu.</span>
+    <span>Được dựng bằng Claude</span>
+  </div>
+</footer>
+
+<script>
+  // live clock
+  function pad(n){ return n.toString().padStart(2,'0'); }
+  function tickClock(){
+    const d = new Date();
+    const time = `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+    const date = `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}`;
+    document.getElementById('clockBox').textContent = `${time} · ${date}`;
+  }
+  tickClock();
+  setInterval(tickClock, 1000);
+
+  // ticker content (duplicated for seamless loop)
+  const headlines = [
+    "Hà Nội thí điểm làn đường ưu tiên xe buýt điện tại 5 quận trung tâm",
+    "Giá cà phê Robusta lập đỉnh mới trong quý III",
+    "Đội tuyển futsal nữ giành vé vào bán kết châu Á",
+    "Một startup Việt ra mắt chip AI tiết kiệm năng lượng",
+    "Miền Trung chủ động ứng phó đợt mưa lớn đầu mùa",
+    "Ngân hàng Nhà nước giữ nguyên lãi suất điều hành"
+  ];
+  const track = document.getElementById('tickerTrack');
+  const content = headlines.map(h => `<span class="item">${h}</span>`).join('');
+  track.innerHTML = content + content;
+
+  // tab switching
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const panels = document.querySelectorAll('.article-grid');
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const target = btn.dataset.tab;
+      panels.forEach(p => {
+        p.classList.toggle('hidden', p.dataset.panel !== target);
+      });
+    });
+  });
+
+  // count-up stats on scroll into view
+  const statNums = document.querySelectorAll('.stat-num');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        const el = entry.target;
+        const target = parseInt(el.dataset.count, 10);
+        let current = 0;
+        const step = Math.max(1, Math.floor(target / 40));
+        const iv = setInterval(() => {
+          current += step;
+          if(current >= target){ current = target; clearInterval(iv); }
+          el.textContent = current;
+        }, 30);
+        observer.unobserve(el);
+      }
+    });
+  }, { threshold: 0.4 });
+  statNums.forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
